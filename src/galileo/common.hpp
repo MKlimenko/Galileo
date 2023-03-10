@@ -2,6 +2,8 @@
 
 #include "galileo.h"
 #include <sycl/sycl.hpp>
+#include <algorithm>
+#include <numeric>
 
 namespace common {
 	inline auto& GetQueue(GALILEO_QUEUE queue) {
@@ -24,4 +26,35 @@ namespace common {
 
 		return device == sycl::usm::alloc::shared;
 	}
+
+	template <typename ... Args>
+	bool VerifyQueryPtrs(const GALILEO_TENSOR& lhs, const GALILEO_TENSOR& rhs, Args&& ...args) {
+		auto is_same_queue = lhs.associated_queue == rhs.associated_queue;
+		if constexpr (sizeof...(Args) > 0) {
+			is_same_queue &= VerifyQueryPtrs(rhs, args...);
+		}
+		return is_same_queue;
+	}
+
+	template <typename ... Args>
+	bool VerifyDimensionsPtrs(const GALILEO_TENSOR& lhs, const GALILEO_TENSOR& rhs, Args&& ...args) {
+		const auto& lhs_dimensions = lhs.dimensions;
+		const auto& rhs_dimensions = rhs.dimensions;
+		auto is_same = lhs_dimensions.tensor_dimensions_size == rhs_dimensions.tensor_dimensions_size;
+		if (!is_same)
+			return false;
+		is_same &= std::equal(lhs_dimensions.tensor_dimensions, lhs_dimensions.tensor_dimensions + lhs_dimensions.tensor_dimensions_size,
+			rhs_dimensions.tensor_dimensions);
+
+		if constexpr (sizeof...(Args) > 0) {
+			is_same &= VerifyDimensionsPtrs(rhs, args...);
+		}
+		return is_same;
+	}
+
+	inline unsigned int GetTotalSize(const GALILEO_TENSOR_DIMENSIONS& dimensions) {
+		return std::accumulate(dimensions.tensor_dimensions,
+			dimensions.tensor_dimensions + dimensions.tensor_dimensions_size, 0);
+	}
 }
+

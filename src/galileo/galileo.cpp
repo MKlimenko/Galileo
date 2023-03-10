@@ -60,3 +60,21 @@ GALILEO_RESULT GALILEO_Deallocate(GALILEO_QUEUE queue, void* ptr) {
 	sycl::free(ptr, common::GetQueue(queue));
 	return GALILEO_RESULT::GALILEO_RESULT_OK;
 }
+
+GALILEO_RESULT GALILEO_Create1dTensor(GALILEO_QUEUE queue, void* ptr, GALILEO_DATA_TYPE data_type, unsigned int size, GALILEO_TENSOR* tensor) {
+	if (!queue || !ptr || !tensor)
+		return GALILEO_RESULT::GALILEO_RESULT_INVALID_FUNC_PARAMETER;
+
+	// consider creating some conversion function on receiving host pointer
+	// todo: or should it be handled by the C++ header-only interface?
+	if (!common::VerifyPtr(common::GetQueue(queue), ptr))
+		return GALILEO_RESULT::GALILEO_RESULT_NON_USM_POINTER;
+
+	tensor->associated_queue = queue;
+	tensor->tensor_data = ptr;
+	tensor->data_type = data_type;
+	tensor->dimensions.tensor_dimensions_size = 1;
+	tensor->dimensions.tensor_dimensions[0] = size;
+
+	return GALILEO_RESULT::GALILEO_RESULT_OK;
+}

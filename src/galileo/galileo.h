@@ -6,6 +6,8 @@ typedef enum tagGALILEO_RESULT {
 	GALILEO_RESULT_INVALID_FUNC_PARAMETER,
 	GALILEO_RESULT_UNEXPECTED_DATA_TYPE,
 	GALILEO_RESULT_NON_USM_POINTER,
+	GALILEO_RESULT_TENSOR_QUEUE_MISMATCH,
+	GALILEO_RESULT_TENSOR_DIMENSIONS_MISMATCH,
 	GALILEO_RESULT_UNKNOWN_ERROR
 } GALILEO_RESULT;
 
@@ -26,6 +28,20 @@ typedef enum tagGALILEO_DATA_TYPE {
 
 typedef void* GALILEO_QUEUE;
 
+#define GALILEO_MAX_TENSOR_DIMENSIONS 4
+typedef struct tagGALILEO_TENSOR_DIMENSIONS {
+	unsigned int tensor_dimensions[GALILEO_MAX_TENSOR_DIMENSIONS];
+	unsigned int tensor_dimensions_size;
+} GALILEO_TENSOR_DIMENSIONS;
+
+typedef struct tagGALILEO_TENSOR {
+	GALILEO_QUEUE associated_queue;
+	void* tensor_data;
+	GALILEO_DATA_TYPE data_type;
+	GALILEO_TENSOR_DIMENSIONS dimensions;
+} GALILEO_TENSOR;
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,25 +52,27 @@ GALILEO_RESULT GALILEO_InitQueue(GALILEO_QUEUE queue);
 GALILEO_RESULT GALILEO_ReleaseQueue(GALILEO_QUEUE queue);
 GALILEO_RESULT GALILEO_Allocate(GALILEO_QUEUE queue, GALILEO_DATA_TYPE data_type, unsigned int size, void** ptr);
 GALILEO_RESULT GALILEO_Deallocate(GALILEO_QUEUE queue, void* ptr);
+GALILEO_RESULT GALILEO_Create1dTensor(GALILEO_QUEUE queue, void* ptr, GALILEO_DATA_TYPE data_type, unsigned int size, GALILEO_TENSOR* tensor);
 
-GALILEO_RESULT GALILEO_Abs(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Acos(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Acosh(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Asin(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Asinh(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Atan(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Atanh(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Cos(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Cosh(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Erf(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Exp(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Neg(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Sign(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Sin(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Sinh(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Sqrt(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Tan(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
-GALILEO_RESULT GALILEO_Tanh(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type);
+GALILEO_RESULT GALILEO_Abs(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Acos(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Acosh(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Asin(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Asinh(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Atan(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Atanh(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Cos(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Cosh(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Erf(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Exp(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Neg(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Sign(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Sin(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Sinh(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Sqrt(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Tan(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+GALILEO_RESULT GALILEO_Tanh(const GALILEO_TENSOR* input, GALILEO_TENSOR* output);
+
 
 #ifdef __cplusplus
 }

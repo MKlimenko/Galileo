@@ -89,10 +89,10 @@ inline namespace detail {
 		OutputType output;
 		unsigned int size;
 
-		ElementwiseOp(const void* input_ptr, GALILEO_DATA_TYPE input_data_type, unsigned int size_val, void* output_ptr, GALILEO_DATA_TYPE output_data_type) :
-			input(GetVariantFromInput<true, InputType>(input_ptr, input_data_type)),
-			output(GetVariantFromInput<false, OutputType>(output_ptr, output_data_type)),
-			size(size_val) {}
+		ElementwiseOp(const GALILEO_TENSOR& input, GALILEO_TENSOR& output) :
+			input(GetVariantFromInput<true, InputType>(input.tensor_data, input.data_type)),
+			output(GetVariantFromInput<false, OutputType>(output.tensor_data, output.data_type)),
+			size(common::GetTotalSize(input.dimensions)) {}
 
 		void operator()(sycl::handler& h) {
 			std::visit([&](const auto* input_ptr, auto* output_ptr) { Process(h, input_ptr, output_ptr); }, input, output);
@@ -121,18 +121,25 @@ inline namespace detail {
 
 }
 
-#define ELTWISE_FUNCTION_DEF(EXT_NAME, KERNEL_NAME) GALILEO_RESULT EXT_NAME(GALILEO_QUEUE queue, const void* input, GALILEO_DATA_TYPE input_data_type, \
-		unsigned int size, void* output, GALILEO_DATA_TYPE output_data_type) { \
+#define ELTWISE_FUNCTION_DEF(EXT_NAME, KERNEL_NAME) GALILEO_RESULT EXT_NAME(const GALILEO_TENSOR* input, GALILEO_TENSOR* output) { \
 	try { \
-		if (!queue || !input || !output) \
+		if (!input || !output || !input->tensor_data || !output->tensor_data) \
 			return GALILEO_RESULT::GALILEO_RESULT_INVALID_FUNC_PARAMETER; \
-	\
-		const auto input_ptr_state = common::VerifyPtr(common::GetQueue(queue), input); \
-		const auto output_ptr_state = common::VerifyPtr(common::GetQueue(queue), output); \
+	 \
+		if (!common::VerifyQueryPtrs(*input, *output)) \
+			return GALILEO_RESULT::GALILEO_RESULT_TENSOR_QUEUE_MISMATCH; \
+	 \
+		if (!common::VerifyDimensionsPtrs(*input, *output)) \
+			return GALILEO_RESULT::GALILEO_RESULT_TENSOR_DIMENSIONS_MISMATCH; \
+	 \
+		auto queue = input->associated_queue; \
+	 \
+		const auto input_ptr_state = common::VerifyPtr(common::GetQueue(queue), input->tensor_data); \
+		const auto output_ptr_state = common::VerifyPtr(common::GetQueue(queue), output->tensor_data); \
 		if (!input_ptr_state || !output_ptr_state) \
 			return GALILEO_RESULT_NON_USM_POINTER; \
 	\
-		auto kernel = KERNEL_NAME(input, input_data_type, size, output, output_data_type); \
+		auto kernel = KERNEL_NAME(*input, *output); \
 		auto& typed_queue = common::GetQueue(queue); \
 		typed_queue.submit(kernel); \
 	} \
@@ -167,4 +174,3 @@ ELTWISE_FUNCTION(Sinh)
 ELTWISE_FUNCTION(Sqrt)
 ELTWISE_FUNCTION(Tan)
 ELTWISE_FUNCTION(Tanh)
-
