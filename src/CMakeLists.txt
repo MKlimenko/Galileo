@@ -20,6 +20,7 @@ add_library (
 	${CMAKE_CURRENT_LIST_DIR}/galileo/galileo.def
 	${CMAKE_CURRENT_LIST_DIR}/galileo/galileo.cpp
 	${CMAKE_CURRENT_LIST_DIR}/galileo/math.cpp
+	${CMAKE_CURRENT_LIST_DIR}/galileo/math.hpp
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY ${BIN_DST})
@@ -37,3 +38,5 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_LIST_DIR}/galileo/galileo.h ${INC_DST}
 	COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_LINKER_FILE:${PROJECT_NAME}> ${LIB_DST}
 )
+
+target_compile_options(${PROJECT_NAME} PUBLIC -ftime-trace)

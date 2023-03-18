@@ -23,3 +23,10 @@ add_subdirectory(src)
 
 add_subdirectory(examples)
 add_dependencies(galileo_example galileo)
+
+find_package(GTest CONFIG)
+if (GTest_FOUND)
+	enable_testing()
+	add_subdirectory ("test")
+	add_dependencies(galileo_test galileo)
+endif()

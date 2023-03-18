@@ -12,10 +12,30 @@ namespace common {
 
 	inline void* TypeErasedAllocate(sycl::queue& queue, GALILEO_DATA_TYPE data_type, unsigned int size) {
 		switch (data_type) {
+		case GALILEO_UINT8:
+			return sycl::malloc_shared<std::uint8_t>(size, queue);
+		case GALILEO_UINT16:
+			return sycl::malloc_shared<std::uint16_t>(size, queue);
+		case GALILEO_UINT32:
+			return sycl::malloc_shared<std::uint32_t>(size, queue);
+		case GALILEO_UINT64:
+			return sycl::malloc_shared<std::uint64_t>(size, queue);
+		case GALILEO_INT8:
+			return sycl::malloc_shared<std::int8_t>(size, queue);
+		case GALILEO_INT16:
+			return sycl::malloc_shared<std::int16_t>(size, queue);
+		case GALILEO_INT32:
+			return sycl::malloc_shared<std::int32_t>(size, queue);
+		case GALILEO_INT64:
+			return sycl::malloc_shared<std::int64_t>(size, queue);
 		case GALILEO_FLOAT:
 			return sycl::malloc_shared<float>(size, queue);
 		case GALILEO_DOUBLE:
 			return sycl::malloc_shared<double>(size, queue);
+		case GALILEO_HALF:
+			return sycl::malloc_shared<sycl::half>(size, queue);
+		case GALILEO_BFLOAT16:
+			return sycl::malloc_shared<sycl::ext::oneapi::experimental::bfloat16>(size, queue);
 		default:
 			throw GALILEO_RESULT::GALILEO_RESULT_UNEXPECTED_DATA_TYPE;
 		}
