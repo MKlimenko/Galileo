@@ -1,11 +1,26 @@
 #pragma once
 
 #include "galileo.h"
+#define SYCL_EXT_ONEAPI_COMPLEX
 #include <sycl/sycl.hpp>
+#include <sycl/ext/oneapi/experimental/sycl_complex.hpp>
 #include <algorithm>
 #include <numeric>
+#include <type_traits>
+#include <variant>
 
-namespace common {
+namespace galileo::common {
+	#define CONSTIFY(T) std::conditional_t<is_const, const T, T>
+
+	template <typename T>
+	using complex = sycl::ext::oneapi::experimental::complex<T>;
+
+	template <bool is_const, typename ... Args>
+	constexpr std::variant<CONSTIFY(Args)*...> GetVariantFromTuple(std::tuple<Args...> t);
+
+	template <bool is_const, typename ... Args>
+	constexpr std::variant<CONSTIFY(Args)*...> GetPairVariantFromTuple(std::tuple<Args...> t);
+
 	inline auto& GetQueue(GALILEO_QUEUE queue) {
 		return *reinterpret_cast<sycl::queue*>(queue);
 	}
@@ -36,6 +51,10 @@ namespace common {
 			return sycl::malloc_shared<sycl::half>(size, queue);
 		case GALILEO_BFLOAT16:
 			return sycl::malloc_shared<sycl::ext::oneapi::experimental::bfloat16>(size, queue);
+		case GALILEO_COMPLEX_FLOAT:
+			return sycl::malloc_shared<complex<float>>(size, queue);
+		case GALILEO_COMPLEX_DOUBLE:
+			return sycl::malloc_shared<complex<double>>(size, queue);
 		default:
 			throw GALILEO_RESULT::GALILEO_RESULT_UNEXPECTED_DATA_TYPE;
 		}
@@ -76,5 +95,50 @@ namespace common {
 		return std::accumulate(dimensions.tensor_dimensions,
 			dimensions.tensor_dimensions + dimensions.tensor_dimensions_size, 0);
 	}
+
+	template <typename From, typename To>
+	concept is_narrowing_conversion = !requires(From from) {
+		To{ from };
+	};
+
+	template <typename T> struct is_complex : std::false_type {};
+	template <typename T> struct is_complex<const T> : is_complex<T> {};
+	template <typename T> struct is_complex<complex<T>> : std::true_type {};
+	template <typename T> constexpr bool is_complex_v = is_complex<T>::value;
+
+	template <typename T> struct underlying { using type = T; };
+	template <typename T> struct underlying<complex<T>> { using type = T; };
+	template <typename T> using underlying_t = typename underlying<T>::type;
+	
+	template <typename T1, typename T2, bool complex = false>
+	struct TypeHelperImpl {
+		using First = std::conditional_t<std::is_same_v<T1, sycl::ext::oneapi::experimental::bfloat16>, float, T1>;
+		using Second = std::conditional_t<std::is_same_v<T2, sycl::ext::oneapi::experimental::bfloat16>, float, T2>;
+		using RawFirst = First;
+		using RawSecond = Second;
+	};
+	
+	template <typename T1, typename T2>
+	struct TypeHelperImpl<T1, T2, true> {
+		using helper_underlying = TypeHelperImpl<underlying_t<T1>, underlying_t<T2>>;
+
+		using common_type = decltype(std::declval<typename helper_underlying::First>() * std::declval<typename helper_underlying::Second>());
+		using First = complex<common_type>;
+		using Second = complex<common_type>;
+		using RawFirst = std::conditional_t<!is_complex_v<T1>, common_type, First>;
+		using RawSecond = std::conditional_t<!is_complex_v<T2>, common_type, Second>;
+	};
+
+	template <typename T1, typename T2>
+	struct TypeHelper {
+	private:
+		using helper_impl = TypeHelperImpl<T1, T2, is_complex_v<T1> || is_complex_v<T2>>;
+
+	public:
+		using First = typename helper_impl::First;
+		using Second = typename helper_impl::Second;
+		using RawFirst = typename helper_impl::RawFirst;
+		using RawSecond = typename helper_impl::RawSecond;
+	};
 }
 

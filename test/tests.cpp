@@ -1,6 +1,6 @@
 ﻿#include "gtest/gtest.h"
 #include "galileo.h"
-#include "math.hpp"
+#include "unary.hpp"
 
 #include <sycl/sycl.hpp>
 

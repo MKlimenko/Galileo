@@ -1,7 +1,5 @@
 #include "common.hpp"
 
-#include <complex>
-
 GALILEO_RESULT GALILEO_GetLibVersion(unsigned int* major, unsigned int* minor, unsigned int* patch) {
 	if (!major || !minor || !patch)
 		return GALILEO_RESULT::GALILEO_RESULT_INVALID_FUNC_PARAMETER;
@@ -32,7 +30,7 @@ GALILEO_RESULT GALILEO_ReleaseQueue(GALILEO_QUEUE queue) {
 		return GALILEO_RESULT::GALILEO_RESULT_INVALID_FUNC_PARAMETER;
 	
 	using T = sycl::queue;
-	auto& typed_queue = common::GetQueue(queue);
+	auto& typed_queue = galileo::common::GetQueue(queue);
 	typed_queue.wait();
 	typed_queue.~T();
 	return GALILEO_RESULT::GALILEO_RESULT_OK;	
@@ -42,7 +40,7 @@ GALILEO_RESULT GALILEO_Allocate(GALILEO_QUEUE queue, GALILEO_DATA_TYPE data_type
 	try {
 		if (!queue|| !ptr)
 			return GALILEO_RESULT::GALILEO_RESULT_INVALID_FUNC_PARAMETER;
-		*ptr = common::TypeErasedAllocate(common::GetQueue(queue), data_type, size);
+		*ptr = galileo::common::TypeErasedAllocate(galileo::common::GetQueue(queue), data_type, size);
 		return GALILEO_RESULT::GALILEO_RESULT_OK;
 	}
 	catch(GALILEO_RESULT result) {
@@ -57,7 +55,7 @@ GALILEO_RESULT GALILEO_Deallocate(GALILEO_QUEUE queue, void* ptr) {
 	if (!queue|| !ptr)
 		return GALILEO_RESULT::GALILEO_RESULT_INVALID_FUNC_PARAMETER;
 
-	sycl::free(ptr, common::GetQueue(queue));
+	sycl::free(ptr, galileo::common::GetQueue(queue));
 	return GALILEO_RESULT::GALILEO_RESULT_OK;
 }
 
@@ -67,7 +65,7 @@ GALILEO_RESULT GALILEO_Create1dTensor(GALILEO_QUEUE queue, void* ptr, GALILEO_DA
 
 	// consider creating some conversion function on receiving host pointer
 	// todo: or should it be handled by the C++ header-only interface?
-	if (!common::VerifyPtr(common::GetQueue(queue), ptr))
+	if (!galileo::common::VerifyPtr(galileo::common::GetQueue(queue), ptr))
 		return GALILEO_RESULT::GALILEO_RESULT_NON_USM_POINTER;
 
 	tensor->associated_queue = queue;
