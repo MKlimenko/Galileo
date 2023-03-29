@@ -93,25 +93,26 @@ namespace galileo {
 				std::visit([&](const auto* input_ptr, auto* output_ptr) { Process(h, input_ptr, output_ptr); }, input, output);
 			}
 		};
-
-		using Abs = UnaryElementwiseOp < TypesToUse::FpWithIntegers, [](auto v) { return sycl::abs(v); } > ;
-		using Acos = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::acos(v); } > ;
-		using Acosh = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::acosh(v); } > ;
-		using Asin = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::asin(v); } > ;
-		using Asinh = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::asinh(v); } > ;
-		using Atan = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::atan(v); } > ;
-		using Atanh = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::atanh(v); } > ;
-		using Cos = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::cos(v); } > ;
-		using Cosh = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::cosh(v); } > ;
-		using Erf = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::erf(v); } > ;
-		using Exp = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::exp(v); } > ;
-		using Log = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::log(v); } > ;
-		using Neg = UnaryElementwiseOp < TypesToUse::FpWithSignedIntegers, [](auto v) { return -v; } > ;
-		using Sign = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::sign(v); } > ;
-		using Sin = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::sin(v); } > ;
-		using Sinh = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::sinh(v); } > ;
-		using Sqrt = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::sqrt(v); } > ;
-		using Tan = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::tan(v); } > ;
-		using Tanh = UnaryElementwiseOp < TypesToUse::OnlyFp, [](auto v) { return sycl::tanh(v); } > ;
 	}
 }
+
+using Abs = galileo::UnaryElementwiseOp < galileo::TypesToUse::FpWithIntegers, [](auto v) { return sycl::abs(v); } > ;
+using Acos = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::acos(v); } > ;
+using Acosh = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::acosh(v); } > ;
+using Asin = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::asin(v); } > ;
+using Asinh = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::asinh(v); } > ;
+using Atan = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::atan(v); } > ;
+using Atanh = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::atanh(v); } > ;
+using Cos = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::cos(v); } > ;
+using Cosh = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::cosh(v); } > ;
+using Erf = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::erf(v); } > ;
+using Exp = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::exp(v); } > ;
+using Log = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::log(v); } > ;
+using Neg = galileo::UnaryElementwiseOp < galileo::TypesToUse::FpWithSignedIntegers, [](auto v) { return -v; } > ;
+using Sign = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::sign(v); } > ;
+using Sin = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::sin(v); } > ;
+using Sinh = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::sinh(v); } > ;
+using Sqrt = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::sqrt(v); } > ;
+using Tan = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::tan(v); } > ;
+using Tanh = galileo::UnaryElementwiseOp <galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::tanh(v); } > ;
+

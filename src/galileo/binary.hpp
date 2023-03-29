@@ -86,9 +86,10 @@ namespace galileo {
 			}
 		};
 
-		using Add = BinaryElementwiseOp < [](auto lhs, auto rhs) { return lhs + rhs; } > ;
-		using Mul = BinaryElementwiseOp < [](auto lhs, auto rhs) { return lhs * rhs; } > ;
-		using Div = BinaryElementwiseOp < [](auto lhs, auto rhs) { return lhs / rhs; } > ;
-		using Sub = BinaryElementwiseOp < [](auto lhs, auto rhs) { return lhs - rhs; } > ;
 	}
 }
+
+using Add = galileo::BinaryElementwiseOp < [](auto lhs, auto rhs) { return lhs + rhs; } > ;
+using Mul = galileo::BinaryElementwiseOp < [](auto lhs, auto rhs) { return lhs * rhs; } > ;
+using Div = galileo::BinaryElementwiseOp < [](auto lhs, auto rhs) { return lhs / rhs; } > ;
+using Sub = galileo::BinaryElementwiseOp < [](auto lhs, auto rhs) { return lhs - rhs; } > ;
