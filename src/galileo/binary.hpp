@@ -18,8 +18,9 @@ namespace galileo {
 				double,
 				sycl::half,
 				sycl::ext::oneapi::experimental::bfloat16,
-				common::complex<float>
-				//common::complex<double>
+				common::complex<float>,
+				common::complex<double>,
+				common::complex<sycl::half>
 			>;
 
 			template <bool is_const, typename T>
@@ -38,7 +39,8 @@ namespace galileo {
 				case GALILEO_HALF: return reinterpret_cast<CONSTIFY(sycl::half)*>(ptr);
 				case GALILEO_BFLOAT16: return reinterpret_cast<CONSTIFY(sycl::ext::oneapi::experimental::bfloat16)*>(ptr);
 				case GALILEO_COMPLEX_FLOAT: return reinterpret_cast<CONSTIFY(common::complex<float>)*>(ptr);
-					//case GALILEO_COMPLEX_DOUBLE: return reinterpret_cast<CONSTIFY(common::complex<double>)*>(ptr);
+				case GALILEO_COMPLEX_DOUBLE: return reinterpret_cast<CONSTIFY(common::complex<double>)*>(ptr);
+				case GALILEO_COMPLEX_HALF: return reinterpret_cast<CONSTIFY(common::complex<sycl::half>)*>(ptr);
 				default:
 					throw GALILEO_RESULT::GALILEO_RESULT_UNEXPECTED_DATA_TYPE;
 				}
