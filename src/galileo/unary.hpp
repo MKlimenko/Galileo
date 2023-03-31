@@ -5,7 +5,9 @@ namespace galileo {
 		enum class TypesToUse {
 			OnlyFp,
 			FpWithSignedIntegers,
-			FpWithIntegers
+			FpWithIntegers,
+			OnlyComplexFp,
+			FpWithIntegersAndComplex
 		};
 
 		template <TypesToUse types_to_use, auto F>
@@ -29,11 +31,25 @@ namespace galileo {
 				sycl::half,
 				sycl::ext::oneapi::experimental::bfloat16
 			>;
+			using eltwise_types_complex_fp = std::tuple<
+				common::complex<float>,
+				common::complex<double>,
+				common::complex<sycl::half>
+			>;
 
 			using eltwise_types_with_signed_integers = decltype(std::tuple_cat(std::declval<eltwise_types_fp>(), std::declval<eltwise_types_integers>()));
 			using eltwise_types_with_integers = decltype(std::tuple_cat(std::declval<eltwise_types_with_signed_integers>(), std::declval<eltwise_types_uintegers>()));
-			using eltwise_types = std::conditional_t<types_to_use == TypesToUse::OnlyFp, eltwise_types_fp,
-				std::conditional_t<types_to_use == TypesToUse::FpWithIntegers, eltwise_types_with_integers, eltwise_types_with_signed_integers>>;
+			using eltwise_types_with_integers_and_complex = decltype(std::tuple_cat(std::declval<eltwise_types_with_integers>(), std::declval<eltwise_types_complex_fp>()));
+
+			using type_map = mk::TypeMap<
+				mk::ValueTypePair<TypesToUse::OnlyFp, eltwise_types_fp>,
+				mk::ValueTypePair<TypesToUse::FpWithSignedIntegers, eltwise_types_with_signed_integers>,
+				mk::ValueTypePair<TypesToUse::FpWithIntegers, eltwise_types_with_integers>,
+				mk::ValueTypePair<TypesToUse::OnlyComplexFp, eltwise_types_complex_fp>,
+				mk::ValueTypePair<TypesToUse::FpWithIntegersAndComplex, eltwise_types_with_integers_and_complex>
+			>;
+
+			using eltwise_types = type_map::GetTypeByValue<types_to_use>;
 
 			template <bool is_const, typename T>
 			static T GetVariantFromInput(CONSTIFY(void)* ptr, GALILEO_DATA_TYPE data_type) {
@@ -57,11 +73,26 @@ namespace galileo {
 						break;
 					}
 				}
+				if constexpr (types_to_use == TypesToUse::FpWithIntegers) {
+					switch (data_type) {
+					case GALILEO_FLOAT: return reinterpret_cast<CONSTIFY(float)*>(ptr);
+					case GALILEO_DOUBLE: return reinterpret_cast<CONSTIFY(double)*>(ptr);
+					case GALILEO_HALF: return reinterpret_cast<CONSTIFY(sycl::half)*>(ptr);
+					case GALILEO_BFLOAT16: return reinterpret_cast<CONSTIFY(sycl::ext::oneapi::experimental::bfloat16)*>(ptr);
+					default:
+						break;
+					}
+				}
+				if constexpr (types_to_use == TypesToUse::OnlyComplexFp) {
+					switch (data_type) {
+					case GALILEO_COMPLEX_FLOAT: return reinterpret_cast<CONSTIFY(common::complex<float>)*>(ptr);
+					case GALILEO_COMPLEX_DOUBLE: return reinterpret_cast<CONSTIFY(common::complex<double>)*>(ptr);
+					case GALILEO_COMPLEX_HALF: return reinterpret_cast<CONSTIFY(common::complex<sycl::half>)*>(ptr);
+					default:
+						break;
+					}
+				}
 				switch (data_type) {
-				case GALILEO_FLOAT: return reinterpret_cast<CONSTIFY(float)*>(ptr);
-				case GALILEO_DOUBLE: return reinterpret_cast<CONSTIFY(double)*>(ptr);
-				case GALILEO_HALF: return reinterpret_cast<CONSTIFY(sycl::half)*>(ptr);
-				case GALILEO_BFLOAT16: return reinterpret_cast<CONSTIFY(sycl::ext::oneapi::experimental::bfloat16)*>(ptr);
 				default:
 					throw GALILEO_RESULT::GALILEO_RESULT_UNEXPECTED_DATA_TYPE;
 				}
@@ -103,6 +134,7 @@ using Asin = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto 
 using Asinh = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::asinh(v); } > ;
 using Atan = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::atan(v); } > ;
 using Atanh = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::atanh(v); } > ;
+using Conj = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyComplexFp, [](auto v) { return sycl::ext::oneapi::experimental::conj(v); } > ;
 using Cos = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::cos(v); } > ;
 using Cosh = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::cosh(v); } > ;
 using Erf = galileo::UnaryElementwiseOp < galileo::TypesToUse::OnlyFp, [](auto v) { return sycl::erf(v); } > ;

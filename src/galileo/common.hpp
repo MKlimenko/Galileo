@@ -4,10 +4,13 @@
 #define SYCL_EXT_ONEAPI_COMPLEX
 #include <sycl/sycl.hpp>
 #include <sycl/ext/oneapi/experimental/sycl_complex.hpp>
+
 #include <algorithm>
 #include <numeric>
 #include <type_traits>
 #include <variant>
+
+#include "../../external/type_map/include/type_map.hpp"
 
 namespace galileo::common {
 	#define CONSTIFY(T) std::conditional_t<is_const, const T, T>
@@ -55,6 +58,8 @@ namespace galileo::common {
 			return sycl::malloc_shared<complex<float>>(size, queue);
 		case GALILEO_COMPLEX_DOUBLE:
 			return sycl::malloc_shared<complex<double>>(size, queue);
+		case GALILEO_COMPLEX_HALF:
+			return sycl::malloc_shared<complex<sycl::half>>(size, queue);
 		default:
 			throw GALILEO_RESULT::GALILEO_RESULT_UNEXPECTED_DATA_TYPE;
 		}

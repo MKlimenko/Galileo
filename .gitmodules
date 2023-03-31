@@ -1,0 +1,3 @@
+[submodule "external/type_map"]
+	path = external/type_map
+	url = https://github.com/MKlimenko/type_map.git
