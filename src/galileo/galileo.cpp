@@ -22,7 +22,6 @@ GALILEO_RESULT GALILEO_InitQueue(GALILEO_QUEUE queue) {
 		return GALILEO_RESULT::GALILEO_RESULT_INVALID_FUNC_PARAMETER;
 	
 	new (queue) sycl::queue();
-	std::cout << reinterpret_cast<sycl::queue*>(queue)->get_device().get_info<sycl::info::device::name>() << std::endl;
 	return GALILEO_RESULT::GALILEO_RESULT_OK;	
 }
 

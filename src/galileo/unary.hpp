@@ -73,7 +73,7 @@ namespace galileo {
 						break;
 					}
 				}
-				if constexpr (types_to_use == TypesToUse::FpWithIntegers) {
+				if constexpr (types_to_use != TypesToUse::OnlyComplexFp) {
 					switch (data_type) {
 					case GALILEO_FLOAT: return reinterpret_cast<CONSTIFY(float)*>(ptr);
 					case GALILEO_DOUBLE: return reinterpret_cast<CONSTIFY(double)*>(ptr);
