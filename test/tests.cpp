@@ -44,7 +44,7 @@ TEST(InfrastructureTests, InitAndReleaseQueue) {
 TEST(InfrastructureTests, AllocateDeallocate) {
 	auto queue_ptr = GetQueue();
 	constexpr auto size = 1024;
-	for (auto type = static_cast<int>(GALILEO_UINT8); type <= static_cast<int>(GALILEO_BFLOAT16); ++type) {
+	for (auto type = static_cast<int>(GALILEO_UINT8); type <= static_cast<int>(GALILEO_COMPLEX_HALF); ++type) {
 		void* ptr = nullptr;
 		auto result = GALILEO_Allocate(queue_ptr.get(), static_cast<GALILEO_DATA_TYPE>(type), size, &ptr);
 		ASSERT_EQ(result, GALILEO_RESULT::GALILEO_RESULT_OK);

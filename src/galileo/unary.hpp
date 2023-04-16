@@ -28,8 +28,7 @@ namespace galileo {
 			using eltwise_types_fp = std::tuple<
 				float,
 				double,
-				sycl::half,
-				sycl::ext::oneapi::experimental::bfloat16
+				sycl::half
 			>;
 			using eltwise_types_complex_fp = std::tuple<
 				common::complex<float>,
@@ -78,7 +77,6 @@ namespace galileo {
 					case GALILEO_FLOAT: return reinterpret_cast<CONSTIFY(float)*>(ptr);
 					case GALILEO_DOUBLE: return reinterpret_cast<CONSTIFY(double)*>(ptr);
 					case GALILEO_HALF: return reinterpret_cast<CONSTIFY(sycl::half)*>(ptr);
-					case GALILEO_BFLOAT16: return reinterpret_cast<CONSTIFY(sycl::ext::oneapi::experimental::bfloat16)*>(ptr);
 					default:
 						break;
 					}
@@ -101,7 +99,7 @@ namespace galileo {
 			template <typename T, typename U>
 			void Process(sycl::handler& h, const T* input_ptr, U* output_ptr) {
 				h.parallel_for(size, [=](auto i) {
-					auto src = static_cast<std::conditional_t<std::is_same_v<T, sycl::ext::oneapi::experimental::bfloat16>, float, T>>(input_ptr[i]);
+					auto src = input_ptr[i];
 					auto dst = F(src);
 					output_ptr[i] = static_cast<U>(dst);
 					});

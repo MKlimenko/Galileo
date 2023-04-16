@@ -52,8 +52,6 @@ namespace galileo::common {
 			return sycl::malloc_shared<double>(size, queue);
 		case GALILEO_HALF:
 			return sycl::malloc_shared<sycl::half>(size, queue);
-		case GALILEO_BFLOAT16:
-			return sycl::malloc_shared<sycl::ext::oneapi::experimental::bfloat16>(size, queue);
 		case GALILEO_COMPLEX_FLOAT:
 			return sycl::malloc_shared<complex<float>>(size, queue);
 		case GALILEO_COMPLEX_DOUBLE:
@@ -117,8 +115,8 @@ namespace galileo::common {
 	
 	template <typename T1, typename T2, bool complex = false>
 	struct TypeHelperImpl {
-		using First = std::conditional_t<std::is_same_v<T1, sycl::ext::oneapi::experimental::bfloat16>, float, T1>;
-		using Second = std::conditional_t<std::is_same_v<T2, sycl::ext::oneapi::experimental::bfloat16>, float, T2>;
+		using First = T1;
+		using Second = T2;
 		using RawFirst = First;
 		using RawSecond = Second;
 	};

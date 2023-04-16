@@ -27,6 +27,10 @@
 	catch (GALILEO_RESULT res) { \
 		return res; \
 	} \
+	catch (std::exception& e) { \
+		std::cerr << e.what() << std::endl; \
+		return GALILEO_RESULT::GALILEO_RESULT_UNKNOWN_ERROR; \
+	} \
 	catch (...) { \
 		return GALILEO_RESULT::GALILEO_RESULT_UNKNOWN_ERROR; \
 	} \
