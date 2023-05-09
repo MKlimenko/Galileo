@@ -30,7 +30,7 @@ typedef enum tagGALILEO_DATA_TYPE {
 
 typedef void* GALILEO_QUEUE;
 
-#define GALILEO_MAX_TENSOR_DIMENSIONS 4
+#define GALILEO_MAX_TENSOR_DIMENSIONS 1
 typedef struct tagGALILEO_TENSOR_DIMENSIONS {
 	unsigned int tensor_dimensions[GALILEO_MAX_TENSOR_DIMENSIONS];
 	unsigned int tensor_dimensions_size;
