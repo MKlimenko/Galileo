@@ -61,7 +61,7 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_LIST_DIR}/galileo/galileo.h ${INC_DST}
 	COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_LINKER_FILE:${PROJECT_NAME}> ${LIB_DST}
 	
-	COMMAND ${CMAKE_COMMAND} -E copy ${FILES_TO_COPY} ${BIN_DST}
+#	COMMAND ${CMAKE_COMMAND} -E copy ${FILES_TO_COPY} ${BIN_DST}
 )
 
 target_compile_options(${PROJECT_NAME} PUBLIC -ftime-trace)
